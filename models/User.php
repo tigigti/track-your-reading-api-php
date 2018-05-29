@@ -1,23 +1,27 @@
 <?php
-include_once "../model.php";
 
-class User extends Model {
+class User {
+    private $conn;
+    private $table_name = "user";
 
-    function __construct(){
-        super::__construct();
+    private $id;
+    private $username;
+    private $password;
+    private $email;
+
+    public function __construct($db){
+        $this->conn = $db;
     }
 
-    function register($username,$password,$email){
+    public function register($username,$password,$email){
         $hashedPass = password_hash($password,PASSWORD_DEFAULT);
 
-        $stmt = mysqli_prepare("INSER INTO user(username,password,email) VALUES(?,?,?)");
+        $stmt = $this->conn->prepare("INSERT INTO user(username,password,email) VALUES(?,?,?)");
         $stmt->bind_param("sss",$username,$hashedPass,$email);
         if(!($stmt->execute())){
-            return "Execution Failed.";
+            return false;
         }
-        echo "User Registered!";
         $stmt->close();
+        return true;
     }
-
 }
-?>
